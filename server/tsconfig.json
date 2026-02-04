@@ -1,0 +1,41 @@
+{
+  "compilerOptions": {
+    /* Base Options: */
+    "target": "ES2020",
+    /* Set the JavaScript language version for emitted JavaScript. ES2020 is good for modern Node. */
+    "module": "commonjs",
+    /* Specify module code generation: 'commonjs' is standard for Node.js. */
+    "moduleResolution": "node",
+    /* Specify module resolution strategy: 'node' (Node.js) */
+    "outDir": "./dist",
+    /* Redirect output structure to the directory. */
+    "rootDir": "./src",
+    /* Specify the root directory of input files. */
+    "removeComments": true,
+    /* Do not emit comments to output. */
+
+    /* Strict Type-Checking Options: */
+    "strict": true,
+    /* Enable all strict type-checking options. */
+    "noImplicitAny": true,
+    /* Raise error on expressions and declarations with an implied 'any' type. */
+    "strictNullChecks": true,
+    /* Enable strict null checks. */
+
+    /* Module Interop (Fixes your TS1259 error): */
+    "esModuleInterop": true,
+    /* Enables emit interoperability between CommonJS and ES Modules. */
+    "allowSyntheticDefaultImports": true,
+    /* Allow default imports from modules with no default export. */
+    "forceConsistentCasingInFileNames": true,
+    /* Disallow inconsistently-cased references to the same file. */
+    "skipLibCheck": true,
+    /* Skip type checking of declaration files. Speed up compilation. */
+    "resolveJsonModule": true
+    /* Enable importing .json files. */
+  },
+  "include": ["src/**/*"],
+  /* Include everything in src. */
+  "exclude": ["node_modules", "**/*.spec.ts"]
+  /* Exclude node_modules and test files from the build. */
+}
