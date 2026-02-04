@@ -4,6 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "pnpm -r --parallel run dev",
-    "build": "pnpm -r run build"
+    "build": "pnpm -r run build",
+    "format": "pnpm -r format"
+  },
+  "devDependencies": {
+    "prettier": "^3.4.2"
   }
 }
