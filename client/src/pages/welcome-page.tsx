@@ -1,8 +1,16 @@
 import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
+import { useEffect } from 'react'
+import { generalStore } from '@/store/general-store'
 
 export function WelcomePage() {
   const navigate = useNavigate()
+  const clearCart = generalStore((state) => state.clearCart)
+
+  // Ensure cart is cleared when landing on Welcome Page
+  useEffect(() => {
+    clearCart()
+  }, [clearCart])
 
   return (
     <div className="h-full w-full flex flex-col items-center justify-center bg-zinc-950 text-white relative overflow-hidden">

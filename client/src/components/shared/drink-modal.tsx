@@ -19,40 +19,34 @@ export function DrinkModal() {
   const [regularQuantity, setRegularQuantity] = useState(0)
   const [doubleQuantity, setDoubleQuantity] = useState(0)
 
-  // Check if this drink is already in the cart (excluding the one being edited)
-  const existingInCart = cart.find(item => 
-    item.id === selectedDrink?.id && 
-    item.cartId !== editingCartItem?.cartId
-  )
+  // Find ALL cart items for this drink (both regular and double)
+  const existingItems = cart.filter(item => item.id === selectedDrink?.id)
+  
+  // Check if this drink is already in the cart (excluding the ones being edited)
+  // This is mostly for the "Already in basket" warning if we are adding NEW items
+  const isAlreadyInBasket = existingItems.length > 0 && !editingCartItem
 
   // Initialize state when modal opens
   useEffect(() => {
-    if (isDrinkModalOpen) {
-      if (editingCartItem) {
-        // If editing, we need to see if there's a "counterpart" in the cart
-        // e.g., if editing a Double, is there a Regular version already?
-        // This logic gets complex with the current store structure (separate items).
-        // For now, we will just edit the single item selected.
-        // BUT, the user asked to split them.
-        
-        // To solve "5 double and 1 basic", we actually need to treat them as separate line items in the cart,
-        // but perhaps manage them together in the UI?
-        // Or, simpler: The modal adds TWO separate items to the cart if both are selected.
-        
-        if (editingCartItem.isDouble) {
-          setDoubleQuantity(editingCartItem.quantity)
-          setRegularQuantity(0)
-        } else {
-          setRegularQuantity(editingCartItem.quantity)
-          setDoubleQuantity(0)
-        }
-      } else {
-        // New item default
+    if (isDrinkModalOpen && selectedDrink) {
+      // Always initialize from the TOTAL state of the cart for this drink ID
+      // This fixes the issue where clicking "1 Gin Tonic" in the basket (which might be the Regular item)
+      // would only show the Regular quantity if we relied on editingCartItem.
+      // By looking at existingItems, we see the full picture.
+      
+      const regularItem = existingItems.find(i => !i.isDouble)
+      const doubleItem = existingItems.find(i => i.isDouble)
+      
+      setRegularQuantity(regularItem ? regularItem.quantity : 0)
+      setDoubleQuantity(doubleItem ? doubleItem.quantity : 0)
+      
+      // If it's a fresh add (no existing items), default to 1 Regular
+      if (existingItems.length === 0) {
         setRegularQuantity(1)
         setDoubleQuantity(0)
       }
     }
-  }, [isDrinkModalOpen, editingCartItem])
+  }, [isDrinkModalOpen, selectedDrink]) // Removed editingCartItem dependency to rely on cart state
 
   if (!isDrinkModalOpen || !selectedDrink) return null
 
@@ -66,79 +60,37 @@ export function DrinkModal() {
   const totalPrice = (regularPrice * regularQuantity) + (doublePrice * doubleQuantity)
 
   const handleSave = () => {
-    // If editing, we might need to update one item and potentially create another, 
-    // or delete the one being edited if quantity goes to 0.
-    // This is getting tricky with the current "edit one item" architecture.
-    
-    // SIMPLIFIED APPROACH for this request:
-    // If we are in "Edit Mode", we are technically editing the *concept* of this drink in the cart.
-    // We should probably remove the old item(s) for this drink and add new ones based on the new quantities.
-    
-    // However, to keep it robust:
-    // 1. If editingCartItem exists, we remove it first.
-    // 2. Then we add new items based on regularQuantity and doubleQuantity.
-    
-    // But wait, if there was ANOTHER item of the same drink (e.g. we clicked the Double version to edit, but there was also a Regular version in the cart),
-    // we should probably consolidate them in this view?
-    
-    // Let's stick to the requested flow: "Select 5 double and 1 basic".
-    // This implies the modal handles BOTH types simultaneously.
-    
-    // Strategy:
-    // When saving:
-    // 1. If editing, delete the original item.
-    // 2. Add a Regular item if regularQuantity > 0
-    // 3. Add a Double item if doubleQuantity > 0
-    
-    // Note: This might re-order items in the cart, but that's acceptable.
-    
-    if (editingCartItem) {
-       // We need a way to remove the specific item we were editing.
-       // The store has removeFromCart by index, but we have cartId now.
-       // We need a deleteByCartId function in the store, or we find the index.
-       const index = cart.findIndex(i => i.cartId === editingCartItem.cartId)
-       if (index !== -1) {
-         // We can't use removeFromCart(index) directly inside here easily without exposing it or modifying store.
-         // Let's assume we modify the store to handle this "complex update".
-         // For now, let's just use the existing addToCart and we might end up with duplicates if we don't delete.
-         
-         // Actually, the prompt implies a UI change to allow selecting both.
-         // Let's implement the UI first, and for the logic:
-         // If we are editing, we update the *current* item to match one of the non-zero quantities,
-         // and add a new item for the other if needed.
-         
-         // Better yet: Let's just Add/Update.
-         // If we have both quantities > 0, we are essentially splitting the order.
-      }
+    const { removeFromCart } = generalStore.getState()
+
+    // Helper to remove item
+    const removeItem = (item: any) => {
+       const currentCart = generalStore.getState().cart
+       const idx = currentCart.findIndex(i => i.cartId === item.cartId)
+       if (idx !== -1) removeFromCart(idx)
     }
 
-    // To properly support "5 double, 1 basic", these are two separate cart items.
-    // The modal needs to be able to dispatch multiple actions.
-    
-    if (editingCartItem) {
-        // Special case: We are editing ONE item.
-        // If the user splits it into two types, we update the current one to Type A, and add a new Type B.
-        // If the user changes type completely, we update the current one.
-        
-        if (regularQuantity > 0 && doubleQuantity > 0) {
-            // User wants both. 
-            // Update the existing item to be Regular (arbitrary choice)
-            updateCartItem(editingCartItem.cartId, false, regularQuantity)
-            // Add new Double item
-            addToCart(selectedDrink, true, doubleQuantity)
-        } else if (regularQuantity > 0) {
-            // Only Regular
-            updateCartItem(editingCartItem.cartId, false, regularQuantity)
-        } else if (doubleQuantity > 0) {
-            // Only Double
-            updateCartItem(editingCartItem.cartId, true, doubleQuantity)
-        } else {
-            // Both 0? Should probably delete, but let's just close for now or prevent this state.
-        }
-    } else {
-        // Adding new
-        if (regularQuantity > 0) addToCart(selectedDrink, false, regularQuantity)
-        if (doubleQuantity > 0) addToCart(selectedDrink, true, doubleQuantity)
+    // 1. Handle Regular
+    const existingRegular = existingItems.find(i => !i.isDouble)
+    if (regularQuantity > 0) {
+      if (existingRegular) {
+        updateCartItem(existingRegular.cartId, false, regularQuantity)
+      } else {
+        addToCart(selectedDrink, false, regularQuantity)
+      }
+    } else if (existingRegular) {
+      removeItem(existingRegular)
+    }
+
+    // 2. Handle Double
+    const existingDouble = existingItems.find(i => i.isDouble)
+    if (doubleQuantity > 0) {
+      if (existingDouble) {
+        updateCartItem(existingDouble.cartId, true, doubleQuantity)
+      } else {
+        addToCart(selectedDrink, true, doubleQuantity)
+      }
+    } else if (existingDouble) {
+      removeItem(existingDouble)
     }
     
     closeDrinkModal()
@@ -159,7 +111,7 @@ export function DrinkModal() {
             <h2 className="text-4xl font-bold text-white mb-2">{selectedDrink.name}</h2>
             <div className="flex items-center gap-4">
               <p className="text-2xl text-purple-400 font-mono">${totalPrice.toFixed(2)}</p>
-              {existingInCart && !editingCartItem && (
+              {isAlreadyInBasket && (
                 <div className="flex items-center gap-2 px-3 py-1 bg-yellow-500/10 border border-yellow-500/20 rounded-full">
                   <AlertCircle className="w-4 h-4 text-yellow-500" />
                   <span className="text-sm text-yellow-500 font-medium">Already in basket</span>
@@ -271,7 +223,7 @@ export function DrinkModal() {
             onClick={handleSave}
             disabled={totalQuantity === 0}
           >
-            {editingCartItem ? 'UPDATE ORDER' : 'ADD TO ORDER'}
+            {existingItems.length > 0 ? 'UPDATE ORDER' : 'ADD TO ORDER'}
           </Button>
         </div>
       </div>
