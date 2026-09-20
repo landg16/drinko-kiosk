@@ -1,0 +1,96 @@
+{
+  "currency": "GEL",
+  "channels": ["vodka", "gin", "tonic", "energy"],
+  "ingredients": {
+    "vodka": { "name": { "ka": "არაყი", "en": "Vodka" }, "density": 0.95, "color": "#EAF2FF", "abv": 40 },
+    "gin": { "name": { "ka": "ჯინი", "en": "Gin" }, "density": 0.95, "color": "#E3F6F5", "abv": 40 },
+    "tonic": { "name": { "ka": "ტონიკი", "en": "Tonic" }, "density": 1.03, "color": "#F2F7E8", "abv": 0 },
+    "energy": { "name": { "ka": "ენერგეტიკი", "en": "Energy drink" }, "density": 1.04, "color": "#F5C542", "abv": 0 }
+  },
+  "categories": [
+    { "id": "mixes", "name": { "ka": "მიქსები", "en": "Mixes" } },
+    { "id": "energy", "name": { "ka": "ენერგო მიქსები", "en": "Energy mixes" } },
+    { "id": "shots", "name": { "ka": "შოტები", "en": "Shots" } },
+    { "id": "soft", "name": { "ka": "უალკოჰოლო", "en": "Soft drinks" } }
+  ],
+  "drinks": [
+    {
+      "id": "gin-tonic",
+      "name": { "ka": "ჯინ-ტონიკი", "en": "Gin & Tonic" },
+      "category": "mixes",
+      "strength": 2,
+      "sizes": {
+        "single": { "price": 12, "recipe": [{ "ingredient": "gin", "ml": 40 }, { "ingredient": "tonic", "ml": 160 }] },
+        "double": { "price": 18, "recipe": [{ "ingredient": "gin", "ml": 80 }, { "ingredient": "tonic", "ml": 120 }] }
+      }
+    },
+    {
+      "id": "vodka-tonic",
+      "name": { "ka": "არაყი ტონიკით", "en": "Vodka Tonic" },
+      "category": "mixes",
+      "strength": 2,
+      "sizes": {
+        "single": { "price": 12, "recipe": [{ "ingredient": "vodka", "ml": 40 }, { "ingredient": "tonic", "ml": 160 }] },
+        "double": { "price": 18, "recipe": [{ "ingredient": "vodka", "ml": 80 }, { "ingredient": "tonic", "ml": 120 }] }
+      }
+    },
+    {
+      "id": "vodka-energy",
+      "name": { "ka": "არაყი ენერგეტიკით", "en": "Vodka Energy" },
+      "category": "energy",
+      "strength": 2,
+      "sizes": {
+        "single": { "price": 14, "recipe": [{ "ingredient": "vodka", "ml": 40 }, { "ingredient": "energy", "ml": 160 }] },
+        "double": { "price": 20, "recipe": [{ "ingredient": "vodka", "ml": 80 }, { "ingredient": "energy", "ml": 120 }] }
+      }
+    },
+    {
+      "id": "gin-energy",
+      "name": { "ka": "ჯინი ენერგეტიკით", "en": "Gin Energy" },
+      "category": "energy",
+      "strength": 2,
+      "sizes": {
+        "single": { "price": 14, "recipe": [{ "ingredient": "gin", "ml": 40 }, { "ingredient": "energy", "ml": 160 }] },
+        "double": { "price": 20, "recipe": [{ "ingredient": "gin", "ml": 80 }, { "ingredient": "energy", "ml": 120 }] }
+      }
+    },
+    {
+      "id": "vodka-shot",
+      "name": { "ka": "არაყის შოტი", "en": "Vodka shot" },
+      "category": "shots",
+      "strength": 3,
+      "cup": "small",
+      "sizes": { "single": { "price": 8, "recipe": [{ "ingredient": "vodka", "ml": 50 }] } }
+    },
+    {
+      "id": "gin-shot",
+      "name": { "ka": "ჯინის შოტი", "en": "Gin shot" },
+      "category": "shots",
+      "strength": 3,
+      "cup": "small",
+      "sizes": { "single": { "price": 8, "recipe": [{ "ingredient": "gin", "ml": 50 }] } }
+    },
+    {
+      "id": "tonic",
+      "name": { "ka": "ტონიკი", "en": "Tonic" },
+      "category": "soft",
+      "strength": 0,
+      "sizes": { "single": { "price": 5, "recipe": [{ "ingredient": "tonic", "ml": 200 }] } }
+    },
+    {
+      "id": "energy",
+      "name": { "ka": "ენერგეტიკი", "en": "Energy drink" },
+      "category": "soft",
+      "strength": 0,
+      "sizes": { "single": { "price": 5, "recipe": [{ "ingredient": "energy", "ml": 200 }] } }
+    }
+  ],
+  "device": {
+    "defaultFlowRateGps": 15,
+    "pourOverheadMs": 1500,
+    "tankPollMs": 60000
+  },
+  "order": {
+    "maxPoursPerOrder": 4
+  }
+}
